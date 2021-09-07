@@ -1,6 +1,7 @@
 from urllib.request import urlopen
 import json
 import streamlit as st
+import pandas as pd
 hide_streamlit_style = """
         <style>
         
@@ -17,6 +18,17 @@ html_temp = """
 </body>
 """
 st.markdown(html_temp, unsafe_allow_html=True)
+
+st.markdown("""
+<style>
+table td:nth-child(1) {
+    display: none
+}
+table th:nth-child(1) {
+    display: none
+}
+</style>
+""", unsafe_allow_html=True)
 
 
 
@@ -62,24 +74,38 @@ if st.button('Get CGPA'):
 
 
         for y in fullresult_keys:
+            my_expander = st.expander(label=fullresult[y][0]['semesterName']+ " "+str(fullresult[y][0]['semesterYear']))
+            with my_expander:
+                
+                #st.text("Semester: "+fullresult[y][0]['semesterName']+ " "+str(fullresult[y][0]['semesterYear']))
+                semester_credits=0
+                semester_sgpa=0
+                df = pd.DataFrame(fullresult[y])
+                df=df.drop(columns=['semesterId', 'semesterName','semesterYear','studentId','courseId','grandTotal','cgpa','blocked','blockCause','tevalSubmitted','teval','semesterAccountsClearance'])
+                df=df.rename(columns={'customCourseId': 'Course Code', 'courseTitle': 'Course Title', 'totalCredit': 'Credit', 'pointEquivalent': 'Grade Point', 'gradeLetter': 'Grade'})
+                
+                st.table(df.style.format({ 'Credit': '{:.1f}','Grade Point': '{:.2f}'}))
 
-            semester_credits=0
-            semester_sgpa=0
 
 
-            for x in range(len(fullresult[y])):
+                for x in range(len(fullresult[y])):
 
 
-                total_credits = total_credits + fullresult[y][x]['totalCredit']
+                    total_credits = total_credits + fullresult[y][x]['totalCredit']
 
 
-                total_cgpa = total_cgpa + ((fullresult[y][x]['pointEquivalent'])*(fullresult[y][x]['totalCredit']))
-        CGPA= total_cgpa/total_credits
+                    total_cgpa = total_cgpa + ((fullresult[y][x]['pointEquivalent'])*(fullresult[y][x]['totalCredit']))
+                    semester_credits= semester_credits + fullresult[y][x]['totalCredit']
+                st.text("Credits Completed this semester: "+ str(int(semester_credits)))
+                SGPA= fullresult[y][0]["cgpa"]
+                st.text("SGPA : "+ str(SGPA))
+
+            CGPA= total_cgpa/total_credits
 
 
         st.text("Total Credits Completed: "+ str(int(total_credits)))
-        number = 3.1415926
-        st.success(f"CGPA: {CGPA:.2f}")
+        st.success(f"CGPA: {CGPA:.3f}")
         
-    except:
+    except Exception as e: 
+        print(e)
         st.warning("An error occurred. Try again later.")
