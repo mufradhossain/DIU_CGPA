@@ -39,7 +39,7 @@ studentID = st.text_input("Enter your DIU ID")
 
 
 if st.button('Get CGPA'):
-    with st.spinner("Fetching Results. This might take a couple minutes."):
+    with st.spinner("Fetching Results. This might take a couple of minutes."):
             try:
                 studentinfo_url = "http://software.diu.edu.bd:8189/result/studentInfo?studentId="+str(studentID)
                 semesterinfo_url = "http://software.diu.edu.bd:8189/result/semesterList"
