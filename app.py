@@ -110,7 +110,7 @@ if st.button('Get CGPA'):
 
             except Exception as e: 
                 print(e)
-                st.warning("An error occurred. Try again later.")
+                st.error("An error occurred. Try again later.")
 
 
 ON_HEROKU = os.environ.get('ON_HEROKU')
